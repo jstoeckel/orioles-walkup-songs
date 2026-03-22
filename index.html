@@ -22,30 +22,52 @@ body { font-family: Arial, sans-serif; }
 <ul id="lineup" class="lineup"></ul>
 
 <audio id="player" controls></audio>
-
 <script>
-async function loadLineup() {
-  const response = await fetch('/api/players');
-  const players = await response.json();
+const players = [
+  { name: "John Stoeckel", number: 12, folder: "JohnnyStoeckel" },
+  { name: "Player Two", number: 34, folder: "player2" },
+  { name: "Player Three", number: 56, folder: "player3" }
+];
+
+function announce(text) {
+  const msg = new SpeechSynthesisUtterance(text);
+  speechSynthesis.speak(msg);
+}
+
+function loadLineup() {
   const lineupEl = document.getElementById('lineup');
+  lineupEl.innerHTML = "";
 
   players.forEach((p, index) => {
     const li = document.createElement('li');
-    li.textContent = `${index + 1}. ${p.name}`;
-    li.onclick = () => playSong(p.folder);
+
+    li.textContent = `${index + 1}. #${p.number} ${p.name}`;
+
+    // ✅ pass folder correctly
+    li.onclick = () => {
+      playSong(p.name, p.number, p.folder);
+    };
+
     lineupEl.appendChild(li);
   });
 }
 
-function playSong(folder) {
-  const audio = document.getElementById('player');
-  audio.src = `audio/${folder}/walkup.mp3`;
-  audio.play().catch(err => console.log(err));
+function playSong(name, number, folder) {
+  const audio = document.getElementById("player");
+
+  // 🔊 Announce
+  announce(`Now batting, number ${number}, ${name}`);
+
+  // ▶️ Play after delay
+  setTimeout(() => {
+    audio.src = `audio/${folder}/walkup.mp3`;
+    audio.load();
+    audio.play().catch(err => console.log(err));
+  }, 2000);
 }
 
 // Initialize
 loadLineup();
 </script>
-
 </body>
 </html>
