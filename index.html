@@ -43,7 +43,7 @@ fetch(sheetUrl)
 
       btn.onclick = () => {
         const audio = document.getElementById("player");
-        audio.src = `https://drive.google.com/uc?export=download&id=${fileId}`;
+        audio.src = `https://drive.google.com//file/d/${fileId}/preview`;
         audio.currentTime = 0;
         audio.play();
       };
