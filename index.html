@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Walk-Up Songs</title>
+  <style>
+    body { font-family: Arial; text-align: center; background: #111; color: white; }
+    button {
+      width: 90%;
+      padding: 20px;
+      margin: 10px;
+      font-size: 20px;
+      border-radius: 10px;
+      border: none;
+      background: #1e90ff;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+<h2>⚾ Walk-Up Songs</h2>
+<div id="players"></div>
+
+<audio id="player"></audio>
+
+<script>
+const sheetUrl = "PASTE_YOUR_CSV_URL_HERE";
+
+fetch(sheetUrl)
+  .then(res => res.text())
+  .then(data => {
+    const rows = data.split("\n").slice(1);
+    const container = document.getElementById("players");
+
+    rows.forEach(row => {
+      const [name, number, fileId] = row.split(",");
+
+      if (!fileId) return;
+
+      const btn = document.createElement("button");
+      btn.innerText = `${number} - ${name}`;
+
+      btn.onclick = () => {
+        const audio = document.getElementById("player");
+        audio.src = `https://drive.google.com/uc?export=download&id=${fileId}`;
+        audio.currentTime = 0;
+        audio.play();
+      };
+
+      container.appendChild(btn);
+    });
+  });
+</script>
+
+</body>
+</html>
