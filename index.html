@@ -1,34 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Walk-Up Song Lineup</title>
+<style>
+body { font-family: Arial, sans-serif; }
+.lineup { list-style: none; padding: 0; }
+.lineup li {
+  padding: 10px;
+  margin: 5px 0;
+  background: #eee;
+  cursor: pointer;
+  border-radius: 5px;
+}
+.lineup li:hover { background: #ddd; }
+</style>
+</head>
+<body>
+
+<h2>Player Lineup</h2>
+<ul id="lineup" class="lineup"></ul>
+
 <audio id="player" controls></audio>
 
 <script>
-const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR9oWlllaSkmOeeovWg36JIr3GpNUiAskFwwrI1ZSb1RXu6jMV1GSa1_PoqDDLGRmOL87Xxa8fjtXxE/pub?gid=0&single=true&output=csv";
+async function loadLineup() {
+  const response = await fetch('/api/players');
+  const players = await response.json();
+  const lineupEl = document.getElementById('lineup');
 
-fetch(sheetUrl)
-  .then(res => res.text())
-  .then(data => {
-    const rows = data.split("\n").slice(1);
-    const container = document.getElementById("players");
-
-    rows.forEach(row => {
-      const [name, number, fileIdRaw] = row.split(",");
-      const fileId = fileIdRaw?.trim();
-
-      if (!fileId) return;
-
-      const btn = document.createElement("button");
-      btn.innerText = `${number} - ${name}`;
-
-      btn.onclick = () => {
-        const audio = document.getElementById("player");
-
-        audio.src = `https://drive.google.com/uc?export=download&id=${fileId}`;
-        audio.load();
-        audio.currentTime = 0;
-
-        audio.play().catch(err => console.log(err));
-      };
-
-      container.appendChild(btn);
-    });
+  players.forEach((p, index) => {
+    const li = document.createElement('li');
+    li.textContent = `${index + 1}. ${p.name}`;
+    li.onclick = () => playSong(p.folder);
+    lineupEl.appendChild(li);
   });
+}
+
+function playSong(folder) {
+  const audio = document.getElementById('player');
+  audio.src = `audio/${folder}/walkup.mp3`;
+  audio.play().catch(err => console.log(err));
+}
+
+// Initialize
+loadLineup();
 </script>
+
+</body>
+</html>
