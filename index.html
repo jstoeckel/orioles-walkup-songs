@@ -4,31 +4,94 @@
 <meta charset="UTF-8">
 <title>Walk-Up Song Lineup</title>
 <style>
-body { font-family: Arial, sans-serif; }
-.lineup { list-style: none; padding: 0; }
-.lineup li {
-  padding: 10px;
-  margin: 5px 0;
-  background: #eee;
-  cursor: pointer;
-  border-radius: 5px;
-}
-.lineup li:hover { background: #ddd; }
+  body {
+    font-family: 'Arial', sans-serif;
+    background-color: #000000; /* black background */
+    color: #FFFFFF; /* white text */
+    text-align: center;
+    margin: 0;
+    padding: 20px;
+  }
+
+  h2 {
+    color: #DF4601; /* orange heading */
+    margin-bottom: 20px;
+    font-size: 2em;
+  }
+
+  #lineup {
+    list-style: none;
+    padding: 0;
+    margin: 0 auto;
+    max-width: 500px;
+  }
+
+  #lineup li {
+    padding: 15px;
+    margin: 10px 0;
+    background-color: #DF4601; /* orange button */
+    color: #FFFFFF;
+    cursor: pointer;
+    border-radius: 10px;
+    font-weight: bold;
+    transition: background-color 0.3s, transform 0.2s;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+  }
+
+  #lineup li:hover {
+    background-color: #FFFFFF;
+    color: #DF4601;
+    transform: scale(1.05);
+  }
+
+  audio {
+    margin-top: 20px;
+    width: 90%;
+    max-width: 500px;
+  }
+
+  @media (max-width: 600px) {
+    #lineup li {
+      font-size: 1em;
+      padding: 12px;
+    }
+
+    h2 {
+      font-size: 1.5em;
+    }
+  }
 </style>
 </head>
 <body>
 
-<h2>Player Lineup</h2>
+<h2>Orioles Player Lineup Walkup Songs</h2>
 <ul id="lineup" class="lineup"></ul>
 
 <audio id="player" controls></audio>
 <script>
+  const FADE_TIMEOUT_MS = 6000; // 6 seconds by default
+const FADE_DURATION_MS = 3000; // fade duration in ms
+
 const players = [
-  { name: "John Stoeckel", number: 12, folder: "JohnnyStoeckel" },
+  { name: "Johnny Stoeckel", number: 12, folder: "JohnnyStoeckel" },
   { name: "Player Two", number: 34, folder: "player2" },
   { name: "Player Three", number: 56, folder: "player3" }
 ];
+function fadeOut(audio, duration = FADE_DURATION_MS) {
+  const steps = 20; // number of steps for smooth fade
+  const stepTime = duration / steps;
+  let currentStep = 0;
 
+  const fadeInterval = setInterval(() => {
+    currentStep++;
+    audio.volume = Math.max(1 - currentStep / steps, 0);
+    if (currentStep >= steps) {
+      clearInterval(fadeInterval);
+      audio.pause();
+      audio.volume = 1; // reset for next song
+    }
+  }, stepTime);
+}
 function announce(text) {
   const msg = new SpeechSynthesisUtterance(text);
   speechSynthesis.speak(msg);
@@ -55,15 +118,21 @@ function loadLineup() {
 function playSong(name, number, folder) {
   const audio = document.getElementById("player");
 
-  // 🔊 Announce
-  announce(`Now batting, number ${number}, ${name}`);
+  // Announce player
+  //announce(`Now batting, number ${number}, ${name}`);
 
-  // ▶️ Play after delay
+  // Play song after announcement delay
   setTimeout(() => {
     audio.src = `audio/${folder}/walkup.mp3`;
     audio.load();
+    audio.volume = 1;
     audio.play().catch(err => console.log(err));
-  }, 2000);
+
+    // Start fade timer
+    setTimeout(() => {
+      fadeOut(audio);
+    }, FADE_TIMEOUT_MS);
+  }, 0); // 2-second announcement delay
 }
 
 // Initialize
