@@ -1,28 +1,4 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Walk-Up Songs</title>
-  <style>
-    body { font-family: Arial; text-align: center; background: #111; color: white; }
-    button {
-      width: 90%;
-      padding: 20px;
-      margin: 10px;
-      font-size: 20px;
-      border-radius: 10px;
-      border: none;
-      background: #1e90ff;
-      color: white;
-    }
-  </style>
-</head>
-<body>
-
-<h2>⚾ Walk-Up Songs</h2>
-<div id="players"></div>
-
-<audio id="player"></audio>
+<audio id="player" controls></audio>
 
 <script>
 const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR9oWlllaSkmOeeovWg36JIr3GpNUiAskFwwrI1ZSb1RXu6jMV1GSa1_PoqDDLGRmOL87Xxa8fjtXxE/pub?gid=0&single=true&output=csv";
@@ -34,7 +10,8 @@ fetch(sheetUrl)
     const container = document.getElementById("players");
 
     rows.forEach(row => {
-      const [name, number, fileId] = row.split(",");
+      const [name, number, fileIdRaw] = row.split(",");
+      const fileId = fileIdRaw?.trim();
 
       if (!fileId) return;
 
@@ -43,15 +20,15 @@ fetch(sheetUrl)
 
       btn.onclick = () => {
         const audio = document.getElementById("player");
-        audio.src = `https://drive.google.com//file/d/${fileId}/preview`;
+
+        audio.src = `https://drive.google.com/uc?export=download&id=${fileId}`;
+        audio.load();
         audio.currentTime = 0;
-        audio.play();
+
+        audio.play().catch(err => console.log(err));
       };
 
       container.appendChild(btn);
     });
   });
 </script>
-
-</body>
-</html>
